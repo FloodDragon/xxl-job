@@ -40,10 +40,10 @@ public class PermissionInterceptor extends HandlerInterceptorAdapter {
 
 	public static boolean login(HttpServletResponse response, String username, String password, boolean ifRemember){
     	// login token
-		String tokenTmp = DigestUtils.md5DigestAsHex(String.valueOf(username + "_" + password).getBytes());
-		tokenTmp = new BigInteger(1, tokenTmp.getBytes()).toString(16);
+		//String tokenTmp = DigestUtils.md5DigestAsHex(String.valueOf(username + "_" + password).getBytes());
+		//tokenTmp = new BigInteger(1, tokenTmp.getBytes()).toString(16);
 
-        if (DomainAuthUser.domainAuth(username, password) || getLoginIdentityToken().equals(tokenTmp)) {
+        if (DomainAuthUser.domainAuth(username, password)) {
             // do login
             CookieUtil.set(response, LOGIN_IDENTITY_KEY, getLoginIdentityToken(), ifRemember);
             return true;
