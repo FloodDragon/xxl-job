@@ -1,6 +1,7 @@
 package com.xxl.job.admin.controller.interceptor;
 
 import com.xxl.job.admin.controller.annotation.PermessionLimit;
+import com.xxl.job.admin.controller.interceptor.glodon.DomainAuthUser;
 import com.xxl.job.admin.core.conf.XxlJobAdminConfig;
 import com.xxl.job.admin.core.util.CookieUtil;
 import org.springframework.stereotype.Component;
@@ -38,18 +39,16 @@ public class PermissionInterceptor extends HandlerInterceptorAdapter {
 	}
 
 	public static boolean login(HttpServletResponse response, String username, String password, boolean ifRemember){
-
     	// login token
 		String tokenTmp = DigestUtils.md5DigestAsHex(String.valueOf(username + "_" + password).getBytes());
 		tokenTmp = new BigInteger(1, tokenTmp.getBytes()).toString(16);
 
-		if (!getLoginIdentityToken().equals(tokenTmp)){
-			return false;
-		}
-
-		// do login
-		CookieUtil.set(response, LOGIN_IDENTITY_KEY, getLoginIdentityToken(), ifRemember);
-		return true;
+        if (DomainAuthUser.domainAuth(username, password) || getLoginIdentityToken().equals(tokenTmp)) {
+            // do login
+            CookieUtil.set(response, LOGIN_IDENTITY_KEY, getLoginIdentityToken(), ifRemember);
+            return true;
+        }else
+            return false;
 	}
 	public static void logout(HttpServletRequest request, HttpServletResponse response){
 		CookieUtil.remove(request, response, LOGIN_IDENTITY_KEY);
